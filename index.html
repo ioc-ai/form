@@ -16,12 +16,28 @@
       </div>
 
       <div class="mb-3">
+        <label for="lokasi" class="form-label">Nama Lokasi</label>
+        <input type="text" class="form-control" id="lokasi" required />
+      </div>
+
+      <div class="mb-3">
         <label for="foto" class="form-label">Ambil Foto</label>
         <input type="file" class="form-control" id="foto" accept="image/*" capture="environment" required />
       </div>
 
-      <input type="hidden" id="latitude" />
-      <input type="hidden" id="longitude" />
+      <div class="mb-3">
+        <button type="button" class="btn btn-secondary" id="ambilKoordinat">Ambil Koordinat Lokasi</button>
+        <div class="form-text">Koordinat akan diisi otomatis jika tombol ditekan.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Latitude</label>
+        <input type="text" class="form-control" id="latitude" readonly />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Longitude</label>
+        <input type="text" class="form-control" id="longitude" readonly />
+      </div>
 
       <button type="submit" class="btn btn-primary">Kirim</button>
       <p class="mt-3" id="status"></p>
@@ -29,19 +45,21 @@
   </div>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwKxTCTn8uxEOXnYlzmQPy-pCzn3ea3hHxjV0AAxmFZ/dev'; // Ganti dengan URL Web App Apps Script kamu
+    const scriptURL = 'PASTE_WEB_APP_URL_HERE'; // Ganti dengan URL Web App Apps Script kamu
 
-    // Ambil lokasi GPS saat halaman dimuat
-    navigator.geolocation.getCurrentPosition(pos => {
-      document.getElementById('latitude').value = pos.coords.latitude;
-      document.getElementById('longitude').value = pos.coords.longitude;
-    }, err => {
-      console.error('Gagal ambil lokasi:', err);
+    document.getElementById('ambilKoordinat').addEventListener('click', () => {
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('latitude').value = pos.coords.latitude;
+        document.getElementById('longitude').value = pos.coords.longitude;
+      }, err => {
+        alert('Gagal mengambil lokasi: ' + err.message);
+      });
     });
 
     document.getElementById('reportForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const nama = document.getElementById('nama').value;
+      const lokasi = document.getElementById('lokasi').value;
       const lat = document.getElementById('latitude').value;
       const lon = document.getElementById('longitude').value;
       const file = document.getElementById('foto').files[0];
@@ -53,10 +71,11 @@
 
       const reader = new FileReader();
       reader.onloadend = function() {
-        const fotoBase64 = reader.result; // ini data:image/jpeg;base64,...
+        const fotoBase64 = reader.result;
 
         const data = {
           nama: nama,
+          lokasi: lokasi,
           latitude: lat,
           longitude: lon,
           fotoBase64: fotoBase64
